@@ -3,10 +3,14 @@ using Serilog;
 namespace Quake.Net;
 public partial class ClientMaster : ClientBase
 {
-    public long NetworkId { get; private set; }
+    public string RemoteIp { get; private set; }
+    public int RemotePort { get; private set; }
+    public int NetworkId { get; private set; }
 
-    public ClientMaster(long networkId)
+    public ClientMaster(string remoteIp, int remotePort, int networkId)
     {
+        RemoteIp = remoteIp;
+        RemotePort = remotePort;
         NetworkId = networkId;
     }
 

@@ -6,7 +6,7 @@ namespace Quake.Net;
 // Network manager on the client side.
 public partial class ClientManager : ClientBase
 {
-    public ENetMultiplayerPeer _realClient { get; private set; } = null;
+    public ENetMultiplayerPeer _realClient { get; private set; }
     // TODO will need to make this more robust when we have the ability to move servers.
     public readonly string RemoteHost = "";
 
@@ -47,6 +47,9 @@ public partial class ClientManager : ClientBase
     public void _ConnectedToServer()
     {
         Log.Information("Successfully connected to server.");
+
+        // TODO some other way to determine the scene.
+        this.AddChildDeffered(new SceneManagerServer());
     }
 
     public void _ServerDisconnected()
@@ -82,7 +85,7 @@ public partial class ClientManager : ClientBase
     public override void SendMessage(string message)
     {
         if (_realClient.GetConnectionStatus() != MultiplayerPeer.ConnectionStatus.Connected) return;
-        RpcId(1, new StringName(nameof(ClientMaster.RecvMessage)), message);
+        RpcId(1, new StringName(nameof(ClientBase.RecvMessage)), message);
     }
 
     public override void _NetworkPeerConnected(long id)
