@@ -11,12 +11,18 @@ config_version=5
 [application]
 
 config/name="GodotStairs"
+run/main_scene="res://secene_manager.tscn"
 config/features=PackedStringArray("4.2", "C#")
 config/icon="res://icon.png"
 
 [autoload]
 
 Main="*res://Main.cs"
+
+[debug]
+
+file_logging/log_path="res://logs/godot.log"
+settings/stdout/print_gpu_profile=true
 
 [display]
 

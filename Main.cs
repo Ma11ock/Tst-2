@@ -3,7 +3,6 @@ using Quake.Net;
 using System;
 using Serilog;
 using Common.Log;
-using Serilog.Configuration;
 
 namespace Quake;
 public partial class Main : Node

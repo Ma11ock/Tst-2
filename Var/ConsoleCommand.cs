@@ -2,7 +2,6 @@ using System;
 
 namespace Quake;
 
-
 public class ConsoleCommand : ConsoleObject
 {
     public delegate void ConsoleCommandCallback(CommandParser parser);
