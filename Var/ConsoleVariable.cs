@@ -34,11 +34,11 @@ public class ConsoleVariable : ConsoleObject
     public string String
     {
         get => _String;
-        set
-        {
+        set {
             if (ValidationCallback != null)
             {
-                value = ValidationCallback.Invoke(String, Value, value, Double.TryParse(value, out double tmpValue) ? tmpValue : 0.0);
+                value = ValidationCallback.Invoke(String, Value, value,
+                                                  Double.TryParse(value, out double tmpValue) ? tmpValue : 0.0);
             }
 
             string oldString = String;
@@ -68,8 +68,8 @@ public class ConsoleVariable : ConsoleObject
 
     public void Reset() => String = DefaultValue;
 
-    public ConsoleVariable(string name, string help, ConsoleCommandFlags flags,
-                           string defaultValue, ValidateNewValue validationCallback)
+    public ConsoleVariable(string name, string help, ConsoleCommandFlags flags, string defaultValue,
+                           ValidateNewValue validationCallback)
         : base(name, help, flags)
     {
         DefaultValue = defaultValue;

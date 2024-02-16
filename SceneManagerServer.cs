@@ -1,8 +1,7 @@
 using Godot;
-using System;
-using Quake.Net;
 
 namespace Quake;
+
 public partial class SceneManagerServer : SceneManager
 {
     // TODO remove
@@ -22,6 +21,6 @@ public partial class SceneManagerServer : SceneManager
 
     public void AddPlayer(int id)
     {
-        //PlayerObjects.AddChild();
+        // PlayerObjects.AddChild();
     }
 }

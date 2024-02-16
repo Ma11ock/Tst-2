@@ -9,5 +9,18 @@ public static class Util
 
     public static void AddChildDeffered(this Node node, params Variant[] args) => node?.CallDeferred("add_child", args);
 
-    public static bool IsCaseInsensitiveFileSystem(string path) => (File.Exists(path.ToUpper()) && File.Exists(path.ToLower())) || (Directory.Exists(path.ToUpper()) && Directory.Exists(path.ToLower()));
+    public static bool IsCaseInsensitiveFileSystem(string path)
+        => (File.Exists(path.ToUpper()) && File.Exists(path.ToLower())) || (Directory.Exists(path.ToUpper()) && Directory.Exists(path.ToLower()));
+
+    public static Vector3 SetX(this Node3D node, float x) => node.Position = node.Position with { X = x };
+
+    public static Vector3 SetY(this Node3D node, float y) => node.Position = node.Position with { Y = y };
+
+    public static Vector3 SetZ(this Node3D node, float z) => node.Position = node.Position with { Z = z };
+
+    public static Vector3 SetRotationX(this Node3D node, float x) => node.Rotation = node.Rotation with { X = x };
+
+    public static Vector3 SetRoationY(this Node3D node, float y) => node.Rotation = node.Rotation with { Y = y };
+
+    public static Vector3 SetRotationZ(this Node3D node, float z) => node.Rotation = node.Rotation with { Z = z };
 }
