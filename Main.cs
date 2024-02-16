@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using Quake.Net;
 using System;
 using Serilog;
@@ -93,7 +93,7 @@ public partial class Main : Node
                     // Godot engine arguments that we don't care about.
                     break;
                 default:
-                    if(arg.EndsWith(".tscn"))
+                    if (arg.EndsWith(".tscn"))
                     {
                         // Starting scene.
                         break;
@@ -130,7 +130,7 @@ public partial class Main : Node
                 }
 
                 LocalServerManager localServerManager = new LocalServerManager(host, port);
-                localServerManager.ServerIsReady += OnServerIsReady; 
+                localServerManager.ServerIsReady += OnServerIsReady;
                 this.AddChildDeffered(localServerManager);
                 break;
             case NetworkSetting.Server:
@@ -194,7 +194,7 @@ public partial class Main : Node
     {
         Log.Information("!!!!!!!!!!!!!");
         // Unsubscribe from the event.
-        if(sender is LocalServerManager serverManager)
+        if (sender is LocalServerManager serverManager)
         {
             serverManager.ServerIsReady -= OnServerIsReady;
         }
