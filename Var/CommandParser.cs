@@ -1,24 +1,37 @@
-using System.Linq;
+﻿using System.Linq;
 using System;
 
 namespace Quake;
 
-public class CommandParser
+public class CommandParser : ICommandParser
 {
-    public string[] _args;
+    public const int MAX_TOKENS = 1024;
 
-    public string[] ArgV => _args;
+    // TODO this is a naive implementation that requires constantly deep copying strings.
+    private string[] _args = new string[MAX_TOKENS];
 
-    public string[] ArgS => _args.Skip(1).ToArray();
+    public Span<string> ArgV => new Span<string>(_args, 0, ArgC);
 
-    public int ArgC => _args.Length;
+    public string _Command = "";
 
-    public string Command => _args.Aggregate("", (current, next) => current + " " + next);
+    public string Command
+    {
+        get => _Command;
+        set
+        {
+            value ??= "";
+            TokenizeCommand(value);
+            _Command = value;
+        }
+    }
+
+    public Span<string> ArgS => ArgC == 0 ? new Span<string>() : new Span<string>(_args, 1, ArgC - 1);
+
+    public int ArgC { get; private set; } = 0;
 
     public string this[int i]
     {
-        get => _args[i];
-        set => _args[i] = value;
+        get => ArgV[i];
     }
 
     public string? Find(string needle)
@@ -44,8 +57,116 @@ public class CommandParser
         return null;
     }
 
-    public CommandParser(string[] args)
+    protected bool ValidateCommandName(string name)
+        => (name != null) && !name.Contains('\\') && !name.Contains('\"') && !name.Contains(';');
+
+    private void PushToken(string token) => _args[ArgC++] = token;
+
+    private void TokenizeCommand(string command)
     {
-        _args = args;
+        // Reset everything.
+        ArgC = 0;
+        Command = command ?? "";
+
+        if (string.IsNullOrWhiteSpace(command)) return;
+
+        int len = command.Length;
+        int ptr = 0;
+        while(ptr < len)
+        {
+            // Parse tokens.
+            if (ArgC == MAX_TOKENS) return;
+
+            char curChar = command[ptr];
+            char nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
+
+            while (ptr < len)
+            {
+                // Parse a single token, ignoring whitespace.
+
+                while (curChar != '\0' && Char.IsWhiteSpace(curChar))
+                {
+                    // Ignore whitespace.
+                    curChar = nextChar;
+                    nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
+                    ptr++;
+                }
+
+                if (curChar == '/' && nextChar == '/')
+                {
+                    // Ignore // Comments
+                    // Command should only be a single line, so we're done.
+                    return;
+                }
+                else if (curChar == '/' && nextChar == '*')
+                {
+                    // Ignore Between /* until */
+                    ptr += 2;
+
+
+                    bool foundEnd = false;
+                    while (ptr + 1 < len && !foundEnd)
+                    {
+                        curChar = nextChar;
+                        nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
+
+                        foundEnd = curChar == '/' && nextChar == '*';
+                        ptr += 2;
+                    }
+
+                    if (!foundEnd)
+                    {
+                        // No terminating */, error
+                        throw new CommandParsingException("/* comment encountered but no terminating */", command, ptr - 2);
+                    }
+                }
+                else if (curChar == '”')
+                {
+                    throw new CommandParsingException("Ending quote ” encountered with no opening quote (either \" or “)", command, ptr);
+                }
+                else if (curChar == '"' || curChar == '“')
+                {
+                    // String token
+                    int strTokenPtr = ++ptr;
+                    int stringTokenLen = 0;
+
+                    curChar = nextChar;
+                    nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
+
+                    while (curChar != '\0' && curChar != '"' && curChar != '”')
+                    {
+                        stringTokenLen++;
+                        ptr++;
+
+                        curChar = nextChar;
+                        nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
+                    }
+
+                    PushToken(command.Substring(strTokenPtr, stringTokenLen));
+                    break;
+                }
+
+                int tokenLen = 0;
+                int tokenPtr = ptr;
+                while (curChar != '\0')
+                {
+                    // Non string token.
+
+                    // Check for comment or quote.
+                    if ((curChar == '/' && (nextChar == '/' || nextChar == '*')) ||
+                        (curChar == '"' || curChar != '”' || curChar == '“'))
+                    {
+                        break;
+                    }
+
+                    tokenLen++;
+                    ptr++;
+                    curChar = nextChar;
+                    nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
+                }
+
+                PushToken(command.Substring(tokenPtr, tokenLen));
+            }
+        }
     }
 }
