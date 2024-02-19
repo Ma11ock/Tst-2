@@ -140,6 +140,12 @@ public class CommandParser : ICommandParser
                     nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
                 }
 
+                if (curChar == '\0')
+                {
+                    // No endquote. Throw an exception.
+                    throw new CommandParsingException("Staring quote encountered with no endquote (either \" or ”)", command, ptr - 1);
+                }
+
                 PushToken(command.Substring(strTokenPtr, stringTokenLen));
 
 

@@ -90,4 +90,14 @@ public class ConsoleParsingTests
 
         Assert.Throws<CommandParsingException>(() => parser.Command = "say ” hello");
     }
+
+    [Fact]
+    public void IsParsed_InputIsInvalidSayWithImproperlyQuotedHello_ThrowsCommandParsingException()
+    {
+        CommandParser parser = new CommandParser();
+
+
+        Assert.Throws<CommandParsingException>(() => parser.Command = "say \" hello");
+        Assert.Throws<CommandParsingException>(() => parser.Command = "say ” hello");
+    }
 }
