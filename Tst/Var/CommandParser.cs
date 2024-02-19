@@ -84,7 +84,7 @@ public class CommandParser : ICommandParser
             // Ignore whitespace.
             for (;
                 curChar != '\0' && Char.IsWhiteSpace(curChar);
-                ptr++, curChar = nextChar, nextChar = ptr + 1 < len ? command[ptr + 1] : '\0') ;
+                ptr++, curChar = nextChar, nextChar = ptr + 1 < len ? command[ptr + 1] : '\0');
 
             if (curChar == '/' && nextChar == '/')
             {
@@ -99,20 +99,24 @@ public class CommandParser : ICommandParser
 
 
                 bool foundEnd = false;
-                while (ptr + 1 < len && !foundEnd)
+                while (!foundEnd && curChar != '\0')
                 {
                     curChar = nextChar;
                     nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
 
-                    foundEnd = curChar == '/' && nextChar == '*';
-                    ptr += 2;
+                    foundEnd = curChar == '*' && nextChar == '/';
+                    ptr++;
                 }
 
                 if (!foundEnd)
                 {
-                    // No terminating */, error
+                    // No terminating */.
                     throw new CommandParsingException("/* comment encountered but no terminating */", command, ptr - 2);
                 }
+                // Needed to skip the */.
+                ptr += 2;
+                curChar = nextChar;
+                nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
             }
             else if (curChar == '”')
             {
@@ -144,11 +148,11 @@ public class CommandParser : ICommandParser
                 int tokenLen = 0;
                 int tokenPtr = ptr;
                 for (;
-                     curChar != '\0' && !Char.IsWhiteSpace(curChar);
+                     curChar != '\0' && !Char.IsWhiteSpace(curChar) &&
+                         !((curChar == '/' && (nextChar == '/' || nextChar == '*') ||
+                            (curChar == '"' || curChar == '”' || curChar == '“')));
                      ptr++, tokenLen++, curChar = nextChar, nextChar = ptr + 1 < len ? command[ptr + 1] : '\0');
 
-                //!((curChar == '/' && (nextChar == '/' || nextChar == '*')) ||
-                //          (curChar == '"' || curChar != '”' || curChar == '“'));
                 PushToken(command.Substring(tokenPtr, tokenLen));
             }
         }
