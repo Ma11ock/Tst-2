@@ -141,6 +141,12 @@ public class CommandParser : ICommandParser
                 }
 
                 PushToken(command.Substring(strTokenPtr, stringTokenLen));
+
+
+                // Skip endquote.
+                ptr++;
+                curChar = nextChar;
+                nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
             }
             else
             {
