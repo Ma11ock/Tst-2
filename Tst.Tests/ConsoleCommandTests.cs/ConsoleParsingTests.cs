@@ -11,19 +11,19 @@ public class ConsoleParsingTests
 
         parser.Command = "say";
 
-        Assert.Equal(parser.ArgV[0], "say");
-        Assert.Equal(parser.ArgC, 1);
+        Assert.Equal("say", parser.ArgV[0]);
+        Assert.Equal(1, parser.ArgC);
     }
 
     [Fact]
-    public void IsParsed_InputIsSay_Has1Say()
+    public void IsParsed_InputIs1Say_Has1Say()
     {
         CommandParser parser = new CommandParser();
 
         parser.Command = "1say";
 
-        Assert.Equal(parser.ArgV[0], "1say");
-        Assert.Equal(parser.ArgC, 1);
+        Assert.Equal("1say", parser.ArgV[0]);
+        Assert.Equal(1, parser.ArgC);
     }
 
     [Fact]
@@ -33,9 +33,9 @@ public class ConsoleParsingTests
 
         parser.Command = "say hello";
 
-        Assert.Equal(parser.ArgV[0], "say");
-        Assert.Equal(parser.ArgV[1], "hello");
-        Assert.Equal(parser.ArgC, 2);
+        Assert.Equal("say", parser.ArgV[0]);
+        Assert.Equal("hello", parser.ArgV[1]);
+        Assert.Equal(2, parser.ArgC);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public class ConsoleParsingTests
 
         parser.Command = "say // hello";
 
-        Assert.Equal(parser.ArgV[0], "say");
-        Assert.Equal(parser.ArgC, 1);
+        Assert.Equal("say", parser.ArgV[0]);
+        Assert.Equal(1, parser.ArgC);
     }
 
     [Fact]
@@ -56,9 +56,21 @@ public class ConsoleParsingTests
 
         parser.Command = "say /* hello */ hello";
 
+        Assert.Equal("say", parser.ArgV[0]);
+        Assert.Equal("hello", parser.ArgV[1]);
+        Assert.Equal(2, parser.ArgC);
+    }
+
+    [Fact]
+    public void IsParsed_InputIsQuotedHelloWorld_HasSayWithQuotedHelloWorld()
+    {
+        CommandParser parser = new CommandParser();
+
+        parser.Command = "say \"Hello World\"";
+
         Assert.Equal(parser.ArgV[0], "say");
-        Assert.Equal(parser.ArgV[1], "hello");
-        Assert.Equal(parser.ArgC, 2);
+        Assert.Equal(parser.ArgV[1], "Hello World");
+        Assert.Equal(2, parser.ArgC);
     }
 
     [Fact]
