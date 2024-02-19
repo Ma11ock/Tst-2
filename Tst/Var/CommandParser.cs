@@ -66,7 +66,7 @@ public class CommandParser : ICommandParser
     {
         // Reset everything.
         ArgC = 0;
-        Command = command ?? "";
+        _Command = command ?? "";
 
         if (string.IsNullOrWhiteSpace(command)) return;
 

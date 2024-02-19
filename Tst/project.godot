@@ -32,7 +32,8 @@ window/size/fullscreen=true
 
 [dotnet]
 
-project/assembly_name="GodotStairs"
+project/assembly_name="Tst"
+project/solution_directory="../"
 
 [editor_plugins]
 
