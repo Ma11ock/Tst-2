@@ -11,7 +11,8 @@ public class ConsoleParsingTests
 
         parser.Command = "say";
 
-        Assert.True(parser.ArgV[0] == "say");
+        Assert.Equal(parser.ArgV[0], "say");
+        Assert.Equal(parser.ArgC, 1);
     }
 
     [Fact]
@@ -21,7 +22,8 @@ public class ConsoleParsingTests
 
         parser.Command = "1say";
 
-        Assert.True(parser.ArgV[0] == "1say");
+        Assert.Equal(parser.ArgV[0], "1say");
+        Assert.Equal(parser.ArgC, 1);
     }
 
     [Fact]
@@ -31,7 +33,8 @@ public class ConsoleParsingTests
 
         parser.Command = "say hello";
 
-        Assert.True(parser.ArgV[0] == "say");
-        Assert.True(parser.ArgV[1] == "hello");
+        Assert.Equal(parser.ArgV[0], "say");
+        Assert.Equal(parser.ArgV[1], "hello");
+        Assert.Equal(parser.ArgC, 2);
     }
 }
