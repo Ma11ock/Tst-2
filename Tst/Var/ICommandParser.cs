@@ -1,19 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Quake;
 
 public interface ICommandParser
 {
-
-    public Span<string> ArgV { get; }
+    public IEnumerable<ReadOnlyMemory<char>> ArgV { get; }
 
     public string Command { get; }
 
     public int ArgC { get; }
 
-    public string this[int i] { get; }
+    public ReadOnlyMemory<char> this[int i] { get; }
 
-    public string? Find(string needle);
+    public bool Find(ReadOnlySpan<char> needle, out ReadOnlyMemory<char> result);
 
-    public double? FindDouble(string needle);
+    public bool FindDouble(ReadOnlySpan<char> needle, out double result);
 }
