@@ -1,7 +1,11 @@
-﻿using System.Linq;
-using System;
+﻿using System;
 
 namespace Quake;
+
+// TODO use a char[] instead of a string to store the parsed string
+// and use Span<char> and Memory<char> instead of strings for ArgV.
+// This would mean no allocations and would allow us to support thing
+// like escaped strings.
 
 public class CommandParser : ICommandParser
 {
@@ -133,11 +137,12 @@ public class CommandParser : ICommandParser
 
                 while (curChar != '\0' && curChar != '"' && curChar != '”')
                 {
-                    stringTokenLen++;
                     ptr++;
+                    stringTokenLen++;
 
                     curChar = nextChar;
                     nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
+
                 }
 
                 if (curChar == '\0')

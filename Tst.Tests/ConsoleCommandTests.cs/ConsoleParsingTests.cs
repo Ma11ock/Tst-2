@@ -62,14 +62,38 @@ public class ConsoleParsingTests
     }
 
     [Fact]
-    public void IsParsed_InputIsQuotedHelloWorld_HasSayWithQuotedHelloWorld()
+    public void IsParsed_InputIsQuotedHelloWorld_HasSayWithHelloWorld()
     {
         CommandParser parser = new CommandParser();
 
         parser.Command = "say \"Hello World\"";
 
-        Assert.Equal(parser.ArgV[0], "say");
-        Assert.Equal(parser.ArgV[1], "Hello World");
+        Assert.Equal("say", parser.ArgV[0]);
+        Assert.Equal("Hello World", parser.ArgV[1]);
+        Assert.Equal(2, parser.ArgC);
+    }
+
+    [Fact]
+    public void IsParsed_InputIsQuotedHelloWorldWithEscapedQuotedHello_HasSayWithQuotedHelloWorld()
+    {
+        CommandParser parser = new CommandParser();
+
+        parser.Command = "say \"Hello \\\"World\\\"\"";
+
+        Assert.Equal("say", parser.ArgV[0]);
+        Assert.Equal("Hello \"World\"", parser.ArgV[1]);
+        Assert.Equal(2, parser.ArgC);
+    }
+
+    [Fact]
+    public void IsParsed_InputIsUnicodeQuotedHelloWorldWithEscapedQuotedHello_HasSayWithUnicodeQuotedHelloWorld()
+    {
+        CommandParser parser = new CommandParser();
+
+        parser.Command = "say \"Hello \\“World\\”\"";
+
+        Assert.Equal("say", parser.ArgV[0]);
+        Assert.Equal("Hello “World“", parser.ArgV[1]);
         Assert.Equal(2, parser.ArgC);
     }
 
