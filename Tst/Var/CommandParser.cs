@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Quake;
 
@@ -11,10 +12,13 @@ public class CommandParser : ICommandParser
 {
     public const int MAX_TOKENS = 1024;
 
-    // TODO this is a naive implementation that requires constantly deep copying strings.
-    private string[] _args = new string[MAX_TOKENS];
+    public const int MAX_COMMAND_BUFFER_SIZE = 4096 * 4;
 
-    public Span<string> ArgV => new Span<string>(_args, 0, ArgC);
+    private ReadOnlyMemory<char>[] _args = new ReadOnlyMemory<char>[MAX_TOKENS];
+
+    public IEnumerable<ReadOnlyMemory<char>> ArgV { get => _args; }
+
+    private char[] _commandBuffer = new char[MAX_COMMAND_BUFFER_SIZE];
 
     public string _Command = "";
 
@@ -29,42 +33,75 @@ public class CommandParser : ICommandParser
         }
     }
 
-    public Span<string> ArgS => ArgC == 0 ? new Span<string>() : new Span<string>(_args, 1, ArgC - 1);
-
     public int ArgC { get; private set; } = 0;
 
-    public string this[int i]
+    public int CommandBufferSize { get; private set; }
+
+    public ReadOnlyMemory<char> this[int i]
     {
-        get => ArgV[i];
+        get => _args[i];
     }
 
-    public string? Find(string needle)
+    public bool Find(ReadOnlySpan<char> needle, out ReadOnlyMemory<char> result)
     {
         for (int i = 0; i < ArgC; i++)
         {
-            if (string.Equals(needle, ArgV[i], StringComparison.OrdinalIgnoreCase))
+            if (System.MemoryExtensions.Equals(needle, _args[i].Span, StringComparison.OrdinalIgnoreCase))
             {
-                return (i + 1) < ArgC ? ArgV[i] : null;
+                result = (i + 1) < ArgC ? _args[i] : ReadOnlyMemory<char>.Empty;
+                return true;
             }
         }
 
-        return null;
+        result = ReadOnlyMemory<char>.Empty;
+        return false;
     }
 
-    public double? FindDouble(string needle)
+    public bool FindDouble(ReadOnlySpan<char> needle, out double result)
     {
-        string? result = Find(needle);
-        if (result != null)
+        if (Find(needle, out ReadOnlyMemory<char> arg))
         {
-            return Double.TryParse(result, out double dResult) ? dResult : null;
+            return Double.TryParse(arg.Span, out result);
         }
-        return null;
+
+        result = 0.0;
+        return false;
     }
 
     protected bool ValidateCommandName(string name)
         => (name != null) && !name.Contains('\\') && !name.Contains('\"') && !name.Contains(';');
 
-    private void PushToken(string token) => _args[ArgC++] = token;
+    private void PushTokenAt(int start, int len) => _args[ArgC++] = new ReadOnlyMemory<char>(_commandBuffer, start, len);
+
+    private void PushChar(char c)
+    {
+        if (CommandBufferSize >= MAX_COMMAND_BUFFER_SIZE)
+        {
+            throw new CommandParsingException("", "", 0);
+        }
+        _commandBuffer[CommandBufferSize++] = c;
+    }
+
+    private bool IsEscapable(char c) => c == '"';
+
+    private char GetEscapedVersion(char c)
+    {
+        char result = c;
+        switch (c)
+        {
+            case '"':
+                result = '"'; break;
+            case 'n':
+                result = '\n'; break;
+            case 't':
+                result = '\t'; break;
+            case 'r':
+                result = '\r'; break;
+            default: break;
+        }
+
+        return result;
+    }
 
     private void TokenizeCommand(string command)
     {
@@ -83,12 +120,13 @@ public class CommandParser : ICommandParser
             // Parse tokens.
             if (ArgC == MAX_TOKENS) return;
 
-            // Parse a single token, ignoring whitespace.
+            // Parse a single token, ignoring whitespace and comments.
 
             // Ignore whitespace.
-            for (;
-                curChar != '\0' && Char.IsWhiteSpace(curChar);
-                ptr++, curChar = nextChar, nextChar = ptr + 1 < len ? command[ptr + 1] : '\0');
+            while(curChar != '\0' && Char.IsWhiteSpace(curChar))
+            {
+                Next();
+            }
 
             if (curChar == '/' && nextChar == '/')
             {
@@ -99,17 +137,13 @@ public class CommandParser : ICommandParser
             else if (curChar == '/' && nextChar == '*')
             {
                 // Ignore Between /* until */
-                ptr += 2;
-
+                Next(2);
 
                 bool foundEnd = false;
                 while (!foundEnd && curChar != '\0')
                 {
-                    curChar = nextChar;
-                    nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
-
+                    Next();
                     foundEnd = curChar == '*' && nextChar == '/';
-                    ptr++;
                 }
 
                 if (!foundEnd)
@@ -117,10 +151,8 @@ public class CommandParser : ICommandParser
                     // No terminating */.
                     throw new CommandParsingException("/* comment encountered but no terminating */", command, ptr - 2);
                 }
-                // Needed to skip the */.
-                ptr += 2;
-                curChar = nextChar;
-                nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
+                // Skip the */.
+                Next(2);
             }
             else if (curChar == '”')
             {
@@ -129,20 +161,39 @@ public class CommandParser : ICommandParser
             else if (curChar == '"' || curChar == '“')
             {
                 // String token
-                int strTokenPtr = ++ptr;
-                int stringTokenLen = 0;
+                PushChar(curChar);
+                int strTokenPtr = ptr;
+                int stringTokenLen = 1; // Includes "
 
-                curChar = nextChar;
-                nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
+                Next();
 
                 while (curChar != '\0' && curChar != '"' && curChar != '”')
                 {
-                    ptr++;
-                    stringTokenLen++;
+                    if (curChar == '\\')
+                    {
+                        // Escaped char
+                        if(nextChar == '\0')
+                        {
+                            // We don't allow nullbytes.
+                            throw new CommandParsingException("", command, 0);
+                        }
+                        else if (!IsEscapable(nextChar))
+                        {
+                            // Inescapable.
+                            throw new CommandParsingException("", command, 0);
+                        }
 
-                    curChar = nextChar;
-                    nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
-
+                        // Skip the current character.
+                        PushChar(GetEscapedVersion(nextChar));
+                        Next(2);
+                        stringTokenLen++;
+                    }
+                    else
+                    {
+                        PushChar(curChar);
+                        Next();
+                        stringTokenLen++;
+                    }
                 }
 
                 if (curChar == '\0')
@@ -151,26 +202,39 @@ public class CommandParser : ICommandParser
                     throw new CommandParsingException("Staring quote encountered with no endquote (either \" or ”)", command, ptr - 1);
                 }
 
-                PushToken(command.Substring(strTokenPtr, stringTokenLen));
+                PushChar(curChar);
 
+                PushTokenAt(strTokenPtr, stringTokenLen);
 
-                // Skip endquote.
-                ptr++;
-                curChar = nextChar;
-                nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
+                // Move over endquote.
+                Next();
             }
             else
             {
                 // Non string token.
                 int tokenLen = 0;
                 int tokenPtr = ptr;
-                for (;
-                     curChar != '\0' && !Char.IsWhiteSpace(curChar) &&
-                         !((curChar == '/' && (nextChar == '/' || nextChar == '*') ||
-                            (curChar == '"' || curChar == '”' || curChar == '“')));
-                     ptr++, tokenLen++, curChar = nextChar, nextChar = ptr + 1 < len ? command[ptr + 1] : '\0');
+                while (curChar != '\0' && !Char.IsWhiteSpace(curChar) &&
+                       !((curChar == '/' && (nextChar == '/' || nextChar == '*') ||
+                         (curChar == '"' || curChar == '”' || curChar == '“'))))
+                {
+                    PushChar(curChar);
+                    tokenLen++;
+                    Next();
+                }
 
-                PushToken(command.Substring(tokenPtr, tokenLen));
+                PushTokenAt(tokenPtr, tokenLen);
+            }
+        }
+
+        // Local function to increment curChar and nextChar.
+        void Next(int incrementBy = 1)
+        {
+            while(incrementBy-- > 0)
+            {
+                ptr++;
+                curChar = nextChar;
+                nextChar = ptr + 1 < len ? command[ptr + 1] : '\0';
             }
         }
     }
