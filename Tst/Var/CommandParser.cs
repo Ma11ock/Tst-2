@@ -103,6 +103,36 @@ public class CommandParser : ICommandParser
         return result;
     }
 
+    private void PushChar(char c)
+    {
+        if (CommandBufferSize >= MAX_COMMAND_BUFFER_SIZE)
+        {
+            throw new CommandParsingException("", "", 0);
+        }
+        _commandBuffer[CommandBufferSize++] = c;
+    }
+
+    private bool IsEscapable(char c) => c == '"';
+
+    private char GetEscapedVersion(char c)
+    {
+        char result = c;
+        switch (c)
+        {
+            case '"':
+                result = '"'; break;
+            case 'n':
+                result = '\n'; break;
+            case 't':
+                result = '\t'; break;
+            case 'r':
+                result = '\r'; break;
+            default: break;
+        }
+
+        return result;
+    }
+
     private void TokenizeCommand(string command)
     {
         // Reset everything.
@@ -128,7 +158,7 @@ public class CommandParser : ICommandParser
             // Parse a single token, ignoring whitespace and comments.
 
             // Ignore whitespace.
-            while (curChar != '\0' && Char.IsWhiteSpace(curChar))
+            while(curChar != '\0' && Char.IsWhiteSpace(curChar))
             {
                 Next();
             }
@@ -159,21 +189,25 @@ public class CommandParser : ICommandParser
                 // Skip the */.
                 Next(2);
             }
+            else if (curChar == '”')
+            {
+                throw new CommandParsingException("Ending quote ” encountered with no opening quote (either \" or “)", command, ptr);
+            }
             else if (curChar == '"')
             {
                 // String token
-                int strTokenPtr = CommandBufferSize;
-                int stringTokenLen = 1; // Includes "
                 PushChar(curChar);
+                int strTokenPtr = ptr;
+                int stringTokenLen = 1; // Includes "
 
                 Next();
 
-                while (curChar != '\0' && curChar != '"')
+                while (curChar != '\0' && curChar != '"' && curChar != '”')
                 {
                     if (curChar == '\\')
                     {
                         // Escaped char
-                        if (nextChar == '\0')
+                        if(nextChar == '\0')
                         {
                             // We don't allow nullbytes.
                             throw new CommandParsingException("", command, 0);
@@ -204,7 +238,6 @@ public class CommandParser : ICommandParser
                 }
 
                 PushChar(curChar);
-                stringTokenLen++;
 
                 PushTokenAt(strTokenPtr, stringTokenLen);
 
@@ -215,15 +248,15 @@ public class CommandParser : ICommandParser
             {
                 // Non string token.
                 int tokenLen = 0;
-                int tokenPtr = CommandBufferSize;
+                int tokenPtr = ptr;
                 while (curChar != '\0' && !Char.IsWhiteSpace(curChar) &&
                        !((curChar == '/' && (nextChar == '/' || nextChar == '*') ||
-                         curChar == '"')))
+                         (curChar == '"' || curChar == '”' || curChar == '“'))))
                 {
                     PushChar(curChar);
                     tokenLen++;
                     Next();
-                }                
+                }
 
                 PushTokenAt(tokenPtr, tokenLen);
             }
@@ -232,7 +265,7 @@ public class CommandParser : ICommandParser
         // Local function to increment curChar and nextChar.
         void Next(int incrementBy = 1)
         {
-            while (incrementBy-- > 0)
+            while(incrementBy-- > 0)
             {
                 ptr++;
                 curChar = nextChar;
