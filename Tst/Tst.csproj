@@ -5,6 +5,7 @@
     <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'ios' ">net8.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <Nullable>enable</Nullable>
+    <RootNamespace>Quake</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Serilog" Version="3.1.1" />

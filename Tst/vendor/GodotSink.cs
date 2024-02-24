@@ -12,7 +12,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace Common.Log;
+namespace Quake.vendor;
 
 public class GodotSink : ILogEventSink
 {
@@ -29,7 +29,7 @@ public class GodotSink : ILogEventSink
         formatter.Format(logEvent, writer);
         writer.Flush();
 
-        string color = logEvent.Level switch
+        var color = logEvent.Level switch
         {
             LogEventLevel.Debug => Colors.SpringGreen.ToHtml(),
             LogEventLevel.Information => Colors.Cyan.ToHtml(),
@@ -39,7 +39,7 @@ public class GodotSink : ILogEventSink
             _ => Colors.LightGray.ToHtml(),
         };
 
-        foreach (string line in writer.ToString()?.Split('\n') ?? Array.Empty<string>())
+        foreach (var line in writer.ToString()?.Split('\n') ?? Array.Empty<string>())
             GD.PrintRich($"[color=#{color}]{line}[/color]");
 
         if (logEvent.Exception is null) return;
@@ -61,7 +61,7 @@ public class GodotSink : ILogEventSink
         {
             this.formatProvider = formatProvider;
 
-            MessageTemplate template = new MessageTemplateParser().Parse(outputTemplate);
+            var template = new MessageTemplateParser().Parse(outputTemplate);
             renderers = template.Tokens.Select(
             token => token switch
             {

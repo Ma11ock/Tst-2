@@ -1,7 +1,7 @@
 
 using System;
 
-namespace Quake;
+namespace Quake.PlayerInput.ConsoleCommand;
 
 [Flags]
 public enum ConsoleCommandFlags

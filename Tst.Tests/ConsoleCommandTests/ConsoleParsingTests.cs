@@ -1,6 +1,6 @@
-using Quake;
+using Quake.PlayerInput.ConsoleCommand;
 
-namespace Quake.ConsoleCommandTests;
+namespace Tst.Tests.ConsoleCommandTests;
 
 public class ConsoleParsingTests
 {

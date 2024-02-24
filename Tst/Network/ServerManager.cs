@@ -5,9 +5,9 @@ using System;
 using System.Text;
 using System.IO;
 
-namespace Quake.Net;
+namespace Quake.Network;
 // Server running server side
-public partial class ServerManager : Quake.Net.NetworkManager
+public partial class ServerManager : NetworkManager
 {
     private ENetMultiplayerPeer _realServer = null;
 

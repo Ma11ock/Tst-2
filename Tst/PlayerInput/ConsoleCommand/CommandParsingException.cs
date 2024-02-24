@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Quake;
+namespace Quake.PlayerInput.ConsoleCommand;
 
 public class CommandParsingException : Exception
 {

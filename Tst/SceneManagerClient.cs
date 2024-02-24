@@ -1,5 +1,5 @@
 ﻿using Godot;
-using Quake.Net;
+using Quake.Network;
 
 namespace Quake;
 internal partial class SceneManagerClient : SceneManager

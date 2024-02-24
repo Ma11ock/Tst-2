@@ -1,10 +1,10 @@
-
+﻿
 using Godot;
 using System.Net;
 using System.Net.Sockets;
 using Serilog;
 
-namespace Quake.Net;
+namespace Quake.Network;
 
 public abstract partial class NetworkManager : Godot.Node
 {

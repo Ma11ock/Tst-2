@@ -1,7 +1,9 @@
-using Godot;
+﻿using Godot;
+using Quake.Network;
+using Quake.PlayerInput;
 using Serilog;
 
-namespace Quake.Net;
+namespace Quake.Network;
 
 // Network manager on the client side.
 public partial class ClientManager : ClientBase

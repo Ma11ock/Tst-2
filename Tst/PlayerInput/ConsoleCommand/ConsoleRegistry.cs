@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Quake;
+namespace Quake.PlayerInput.ConsoleCommand;
 
 public class ConsoleRegistry : IConsoleRegistry
 {
@@ -22,11 +22,11 @@ public class ConsoleRegistry : IConsoleRegistry
     /// <exception cref="Argumentnullexception">If consoleObject is null.</exception>
     public ConsoleObject? Register(ConsoleObject consoleObject)
     {
-        if(consoleObject == null) throw new ArgumentNullException(nameof(consoleObject));
+        if (consoleObject == null) throw new ArgumentNullException(nameof(consoleObject));
 
-        if(consoleObject.HasFlags(ConsoleCommandFlags.Unregistered)) return null;
+        if (consoleObject.HasFlags(ConsoleCommandFlags.Unregistered)) return null;
 
-        if (_commands.TryGetValue(consoleObject.Name, out ConsoleObject? maybeResult) && maybeResult != null)
+        if (_commands.TryGetValue(consoleObject.Name, out var maybeResult) && maybeResult != null)
         {
             return maybeResult;
         }
@@ -43,5 +43,5 @@ public class ConsoleRegistry : IConsoleRegistry
     /// A reference to a <see cref="ConsoleObject"/> if one is registered under name <see cref="name"/>.
     /// Null if there is none.
     /// </returns>
-    public ConsoleObject? GetConsoleObject(string name) => _commands.TryGetValue(name ?? "", out ConsoleObject? result) ? result : null;
+    public ConsoleObject? GetConsoleObject(string name) => _commands.TryGetValue(name ?? "", out var result) ? result : null;
 }

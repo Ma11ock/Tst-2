@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Quake;
+namespace Quake.PlayerInput.ConsoleCommand;
 
 // TODO use a char[] instead of a string to store the parsed string
 // and use Span<char> and Memory<char> instead of strings for ArgV.
@@ -42,11 +42,11 @@ public class CommandParser : ICommandParser
 
     public bool Find(ReadOnlySpan<char> needle, out ReadOnlyMemory<char> result)
     {
-        for (int i = 0; i < ArgC; i++)
+        for (var i = 0; i < ArgC; i++)
         {
-            if (System.MemoryExtensions.Equals(needle, _args[i].Span, StringComparison.OrdinalIgnoreCase))
+            if (needle.Equals(_args[i].Span, StringComparison.OrdinalIgnoreCase))
             {
-                result = (i + 1) < ArgC ? _args[i] : ReadOnlyMemory<char>.Empty;
+                result = i + 1 < ArgC ? _args[i] : ReadOnlyMemory<char>.Empty;
                 return true;
             }
         }
@@ -57,9 +57,9 @@ public class CommandParser : ICommandParser
 
     public bool FindDouble(ReadOnlySpan<char> needle, out double result)
     {
-        if (Find(needle, out ReadOnlyMemory<char> arg))
+        if (Find(needle, out var arg))
         {
-            return Double.TryParse(arg.Span, out result);
+            return double.TryParse(arg.Span, out result);
         }
 
         result = 0.0;
@@ -67,7 +67,7 @@ public class CommandParser : ICommandParser
     }
 
     protected bool ValidateCommandName(string name)
-        => (name != null) && !name.Contains('\\') && !name.Contains('\"') && !name.Contains(';');
+        => name != null && !name.Contains('\\') && !name.Contains('\"') && !name.Contains(';');
 
     private void PushTokenAt(int start, int len) => _args[ArgC++] = new ReadOnlyMemory<char>(_commandBuffer, start, len);
 
@@ -84,7 +84,7 @@ public class CommandParser : ICommandParser
 
     private char GetEscapedVersion(char c)
     {
-        char result = c;
+        var result = c;
         switch (c)
         {
             case '"':
@@ -109,15 +109,15 @@ public class CommandParser : ICommandParser
 
         if (string.IsNullOrWhiteSpace(command)) return;
 
-        int len = command.Length;
+        var len = command.Length;
 
         // Start 1 character behind the beginning of the string.
-        int ptr = -1;
-        char curChar = '\0';
-        char nextChar = command[0];
+        var ptr = -1;
+        var curChar = '\0';
+        var nextChar = command[0];
 
         Next();
-       
+
         while (curChar != '\0')
         {
             // Parse tokens.
@@ -126,7 +126,7 @@ public class CommandParser : ICommandParser
             // Parse a single token, ignoring whitespace and comments.
 
             // Ignore whitespace.
-            while(curChar != '\0' && Char.IsWhiteSpace(curChar))
+            while (curChar != '\0' && char.IsWhiteSpace(curChar))
             {
                 Next();
             }
@@ -142,7 +142,7 @@ public class CommandParser : ICommandParser
                 // Ignore Between /* until */
                 Next(2);
 
-                bool foundEnd = false;
+                var foundEnd = false;
                 while (!foundEnd && curChar != '\0')
                 {
                     Next();
@@ -160,8 +160,8 @@ public class CommandParser : ICommandParser
             else if (curChar == '"')
             {
                 // String token
-                int strTokenPtr = CommandBufferSize;
-                int stringTokenLen = 1; // Includes "
+                var strTokenPtr = CommandBufferSize;
+                var stringTokenLen = 1; // Includes "
                 PushChar(curChar);
 
                 Next();
@@ -171,7 +171,7 @@ public class CommandParser : ICommandParser
                     if (curChar == '\\')
                     {
                         // Escaped char
-                        if(nextChar == '\0')
+                        if (nextChar == '\0')
                         {
                             // We don't allow nullbytes.
                             throw new CommandParsingException("", command, 0);
@@ -212,11 +212,11 @@ public class CommandParser : ICommandParser
             else
             {
                 // Non string token.
-                int tokenLen = 0;
-                int tokenPtr = CommandBufferSize;
-                while (curChar != '\0' && !Char.IsWhiteSpace(curChar) &&
-                       !((curChar == '/' && (nextChar == '/' || nextChar == '*') ||
-                         curChar == '"')))
+                var tokenLen = 0;
+                var tokenPtr = CommandBufferSize;
+                while (curChar != '\0' && !char.IsWhiteSpace(curChar) &&
+                       !(curChar == '/' && (nextChar == '/' || nextChar == '*') ||
+                         curChar == '"'))
                 {
                     PushChar(curChar);
                     tokenLen++;
@@ -230,7 +230,7 @@ public class CommandParser : ICommandParser
         // Local function to increment curChar and nextChar.
         void Next(int incrementBy = 1)
         {
-            while(incrementBy-- > 0)
+            while (incrementBy-- > 0)
             {
                 ptr++;
                 curChar = nextChar;

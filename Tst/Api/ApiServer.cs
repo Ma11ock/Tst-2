@@ -106,7 +106,7 @@ public class ApiServer : IDisposable
         HttpListenerRequest request = ctx.Request;
         HttpListenerResponse response = ctx.Response;
 
-        Log.Debug("Got POST request '{0}'", request.Url.AbsolutePath);
+        Log.Debug("Got POST request '{0}'", request.Url?.AbsolutePath);
         if (!request.HasEntityBody)
         {
             return;
@@ -116,6 +116,5 @@ public class ApiServer : IDisposable
     public void Dispose()
     {
         _httpListener?.Close();
-        _httpListener = null;
     }
 }

@@ -1,6 +1,4 @@
-
-
-namespace Quake;
+namespace Quake.PlayerInput.ConsoleCommand;
 
 public abstract class ConsoleObject
 {
@@ -14,7 +12,7 @@ public abstract class ConsoleObject
 
     public ConsoleCommandFlags AddFlags(params ConsoleCommandFlags[] flags)
     {
-        foreach (ConsoleCommandFlags flag in flags)
+        foreach (var flag in flags)
         {
             AddFlags(flag);
         }

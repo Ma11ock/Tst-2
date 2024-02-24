@@ -1,5 +1,4 @@
-
-namespace Quake;
+namespace Quake.PlayerInput.ConsoleCommand;
 
 public interface IConsoleRegistry
 {

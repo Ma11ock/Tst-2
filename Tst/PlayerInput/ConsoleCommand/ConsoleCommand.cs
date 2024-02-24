@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 
-namespace Quake;
+namespace Quake.PlayerInput.ConsoleCommand;
 
 public class ConsoleCommand : ConsoleObject
 {
@@ -11,7 +11,7 @@ public class ConsoleCommand : ConsoleObject
     public ConsoleCommand(string name, string help, ConsoleCommandFlags flags, ConsoleCommandCallback callback)
         : base(name, help, flags)
     {
-        if(callback == null) throw new ArgumentNullException(nameof(callback));
+        if (callback == null) throw new ArgumentNullException(nameof(callback));
         Callback = callback;
     }
 

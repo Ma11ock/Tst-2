@@ -1,8 +1,9 @@
 ﻿using Godot;
-using Quake.Net;
+using Quake.Network;
 using System;
 using Serilog;
-using Common.Log;
+using Quake.Network;
+using Quake.vendor;
 
 namespace Quake;
 public partial class Main : Node

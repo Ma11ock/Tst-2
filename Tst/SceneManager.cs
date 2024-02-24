@@ -1,5 +1,6 @@
 ﻿
 using Godot;
+using Quake.PlayerInput.ConsoleCommand;
 
 namespace Quake;
 

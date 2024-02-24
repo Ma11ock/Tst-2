@@ -1,7 +1,7 @@
 
 using System;
 
-namespace Quake;
+namespace Quake.PlayerInput.ConsoleCommand;
 
 public class ConsoleVariable : ConsoleObject
 {
@@ -34,17 +34,18 @@ public class ConsoleVariable : ConsoleObject
     public string String
     {
         get => _String;
-        set {
+        set
+        {
             if (ValidationCallback != null)
             {
                 value = ValidationCallback.Invoke(String, Value, value,
-                                                  Double.TryParse(value, out double tmpValue) ? tmpValue : 0.0);
+                                                  double.TryParse(value, out var tmpValue) ? tmpValue : 0.0);
             }
 
-            string oldString = String;
-            double oldValue = Value;
+            var oldString = String;
+            var oldValue = Value;
             _String = value ?? "";
-            _Value = Double.TryParse(value, out double newValue) ? newValue : 0.0;
+            _Value = double.TryParse(value, out var newValue) ? newValue : 0.0;
             ModificationCount++;
             CVarChanged?.Invoke(this, new CVarChangedEventArgs(oldString, (long)oldValue, oldValue));
         }
@@ -61,7 +62,7 @@ public class ConsoleVariable : ConsoleObject
     public long Int
     {
         get => (long)Value;
-        set => Value = (double)value;
+        set => Value = value;
     }
 
     public int ModificationCount { get; protected set; } = 0;
@@ -78,16 +79,16 @@ public class ConsoleVariable : ConsoleObject
 
     public void SetValue(string value)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public void SetValue(long value)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public void SetValue(double value)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }

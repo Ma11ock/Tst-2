@@ -1,6 +1,7 @@
+﻿using Quake.PlayerInput;
 using Serilog;
 
-namespace Quake.Net;
+namespace Quake.Network;
 public partial class ClientMaster : ClientBase
 {
     public string RemoteIp { get; private set; }
@@ -35,7 +36,7 @@ public partial class ClientMaster : ClientBase
 
     protected override void OnRecvUserInput(byte[] buffer)
     {
-        Input s = new Input();
+        Binding s = new Input();
         Log.Information("Got buffer with len {0}", buffer.Length);
     }
 

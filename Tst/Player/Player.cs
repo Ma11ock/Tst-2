@@ -1,6 +1,6 @@
-using Godot;
+﻿using Godot;
 
-namespace Quake;
+namespace Quake.Player;
 
 public partial class Player : CharacterBody3D
 {

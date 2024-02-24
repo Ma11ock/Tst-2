@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Quake;
+namespace Quake.PlayerInput.ConsoleCommand;
 
 public interface ICommandParser
 {
