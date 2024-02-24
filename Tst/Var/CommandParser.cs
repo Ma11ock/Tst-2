@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Quake;
 
@@ -16,7 +17,7 @@ public class CommandParser : ICommandParser
 
     private ReadOnlyMemory<char>[] _args = new ReadOnlyMemory<char>[MAX_TOKENS];
 
-    public IEnumerable<ReadOnlyMemory<char>> ArgV { get => _args; }
+    public IEnumerable<ReadOnlyMemory<char>> ArgV => (_args.Clone() as ReadOnlyMemory<char>[])!;
 
     private char[] _commandBuffer = new char[MAX_COMMAND_BUFFER_SIZE];
 
@@ -37,10 +38,7 @@ public class CommandParser : ICommandParser
 
     public int CommandBufferSize { get; private set; }
 
-    public ReadOnlyMemory<char> this[int i]
-    {
-        get => _args[i];
-    }
+    public ReadOnlyMemory<char> GetNthArg(int i) => i < ArgC ? _args[i] : ReadOnlyMemory<char>.Empty;
 
     public bool Find(ReadOnlySpan<char> needle, out ReadOnlyMemory<char> result)
     {

@@ -11,7 +11,7 @@ public interface ICommandParser
 
     public int ArgC { get; }
 
-    public ReadOnlyMemory<char> this[int i] { get; }
+    public ReadOnlyMemory<char> GetNthArg(int i);
 
     public bool Find(ReadOnlySpan<char> needle, out ReadOnlyMemory<char> result);
 

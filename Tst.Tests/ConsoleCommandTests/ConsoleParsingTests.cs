@@ -76,6 +76,36 @@ public class ConsoleParsingTests
     }
 
     [Fact]
+    public void IsParsed_InputIsNull_ListIsEmpty()
+    {
+        CommandParser parser = new CommandParser();
+
+        parser.Command = null;
+
+        Assert.Equal(0, parser.ArgC);
+    }
+
+    [Fact]
+    public void IsParsed_InputIsEmptyString_ListIsEmpty()
+    {
+        CommandParser parser = new CommandParser();
+
+        parser.Command = "";
+
+        Assert.Equal(0, parser.ArgC);
+    }
+
+    [Fact]
+    public void IsParsed_InputIsWhitespace_ListIsEmpty()
+    {
+        CommandParser parser = new CommandParser();
+
+        parser.Command = "      \t";
+
+        Assert.Equal(0, parser.ArgC);
+    }
+
+    [Fact]
     public void IsParsed_InputIsQuotedHelloWorldWithEscapedQuotedHello_HasSayWithQuotedHelloWorld()
     {
         CommandParser parser = new CommandParser();
