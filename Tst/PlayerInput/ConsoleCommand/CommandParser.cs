@@ -109,12 +109,12 @@ public class CommandParser : ICommandParser
 
         if (string.IsNullOrWhiteSpace(command)) return;
 
-        var len = command.Length;
+        int len = command.Length;
 
         // Start 1 character behind the beginning of the string.
-        var ptr = -1;
-        var curChar = '\0';
-        var nextChar = command[0];
+        int ptr = -1;
+        char curChar = '\0';
+        char nextChar = command[0];
 
         Next();
 
