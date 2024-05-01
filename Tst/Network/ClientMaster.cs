@@ -36,7 +36,6 @@ public partial class ClientMaster : ClientBase
 
     protected override void OnRecvUserInput(byte[] buffer)
     {
-        Binding s = new Input();
         Log.Information("Got buffer with len {0}", buffer.Length);
     }
 

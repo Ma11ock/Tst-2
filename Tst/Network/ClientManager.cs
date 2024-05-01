@@ -109,8 +109,6 @@ public partial class ClientManager : ClientBase
         base._PhysicsProcess(delta);
         if (_realClient.GetConnectionStatus() != MultiplayerPeer.ConnectionStatus.Connected) return;
 
-        Input i = new Input() { Msg = "Damn" };
-
         RpcId(1, new StringName(nameof(ClientBase.RecvUserInput)), Variant.From(1));
     }
 }
