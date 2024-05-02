@@ -9,6 +9,8 @@ namespace Quake.Network;
 // Server running server side
 public partial class ServerManager : NetworkManager
 {
+    public static readonly PackedScene SceneManagerScene = ResourceLoader.Load<PackedScene>(@"res://scene_manager_scene.tscn");
+
     private ENetMultiplayerPeer _realServer = null;
 
     public readonly int LocalPort;
@@ -22,6 +24,7 @@ public partial class ServerManager : NetworkManager
     public ServerManager() : this(0)
     {
     }
+
     public ServerManager(int localPort)
     {
         LocalPort = localPort;
@@ -67,7 +70,7 @@ public partial class ServerManager : NetworkManager
         }
 
         // TODO some other way to determine the scene.
-        this.AddChildDeffered(new SceneManagerServer());
+        this.AddChildDeffered(SceneManagerScene.Instantiate<SceneManager>());
     }
 
     private void FailedToAcceptClient(object sender, Exception ex)

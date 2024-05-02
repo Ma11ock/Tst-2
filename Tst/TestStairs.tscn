@@ -1,9 +1,10 @@
-[gd_scene load_steps=149 format=3 uid="uid://wve3dyxt6bln"]
+[gd_scene load_steps=150 format=3 uid="uid://wve3dyxt6bln"]
 
 [ext_resource type="Texture2D" uid="uid://bd5cdspxkh8mf" path="res://Maps/Textures/texture_04.png" id="2"]
 [ext_resource type="Script" path="res://addons/qodot/src/nodes/qodot_map.gd" id="2_yyf3p"]
 [ext_resource type="Resource" uid="uid://c36hv0o6g0udo" path="res://addons/qodot/game_definitions/fgd/qodot_fgd.tres" id="3_vj7q4"]
 [ext_resource type="Texture2D" uid="uid://crsjfiw1gudup" path="res://Maps/Textures/texture_13.png" id="6"]
+[ext_resource type="PackedScene" uid="uid://x3l0v6tbskoe" path="res://Player/Player.tscn" id="6_2oqfw"]
 [ext_resource type="Texture2D" uid="uid://dw4okovmg8ouk" path="res://Maps/Textures/texture_06.png" id="7"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_bxysa"]
@@ -958,3 +959,6 @@ billboard = 1
 text = "Test holes.
 SeparationRayShape3D doesn't work here
 but current method works."
+
+[node name="Player" parent="." instance=ExtResource("6_2oqfw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.7442, -0.875, 23.3585)

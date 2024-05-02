@@ -1,8 +1,5 @@
-[gd_scene load_steps=2 format=3 uid="uid://qjdq4rsnkife"]
-
-[ext_resource type="Script" path="res://ServerManager.cs" id="1_mfxp1"]
+[gd_scene format=3 uid="uid://qjdq4rsnkife"]
 
 [node name="SceneManager" type="Node3D"]
-script = ExtResource("1_mfxp1")
 
 [node name="PlayerObjects" type="Node3D" parent="."]

@@ -8,13 +8,14 @@ namespace Quake.Network;
 // Network manager on the client side.
 public partial class ClientManager : ClientBase
 {
+    public static readonly PackedScene SceneManagerClient = ResourceLoader.Load<PackedScene>(@"res://scene_manager_client.tscn");
     public ENetMultiplayerPeer _realClient { get; private set; }
     // TODO will need to make this more robust when we have the ability to move servers.
     public readonly string RemoteHost = "";
 
     public readonly int RemotePort = 0;
 
-    private Main _Main;
+    private Main _main;
 
     public ClientManager(string remoteHost, int remotePort)
     {
@@ -33,7 +34,7 @@ public partial class ClientManager : ClientBase
         _realClient = new ENetMultiplayerPeer();
         _realClient.CreateClient(RemoteHost, RemotePort);
         Multiplayer.MultiplayerPeer = _realClient;
-        _Main = GetTree().Root.GetNode<Main>("Main");
+        _main = GetTree().Root.GetNode<Main>("Main");
 
         // For enet recving.
         Name = Multiplayer.GetUniqueId().ToString();
@@ -51,7 +52,7 @@ public partial class ClientManager : ClientBase
         Log.Information("Successfully connected to server.");
 
         // TODO some other way to determine the scene.
-        this.AddChildDeffered(new SceneManagerServer());
+        this.AddChildDeffered(SceneManagerClient.Instantiate<SceneManagerClient>());
     }
 
     public void _ServerDisconnected()
@@ -68,13 +69,13 @@ public partial class ClientManager : ClientBase
 
     protected override void OnGetClientData(byte[] data)
     {
-        if (_Main == null)
+        if (_main == null)
         {
             return;
         }
 
         Packet p = new Packet();
-        _Main.SetNextWorldState(p);
+        _main.SetNextWorldState(p);
     }
 
 

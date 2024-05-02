@@ -63,7 +63,7 @@ public partial class Main : Node
 
     private void ParseCmdArgs()
     {
-        GD.Print("Initializing game...");
+        Log.Information("Initializing game...");
 
         string[] args = OS.GetCmdlineArgs();
 
@@ -99,7 +99,7 @@ public partial class Main : Node
                         // Starting scene.
                         break;
                     }
-                    GD.PrintErr($"Warn: \"{arg}\" is not recognized as an argument (maybe an engine argument?).");
+                    Log.Error("Warn: \"{0}\" is not recognized as an argument (maybe an engine argument?).", arg);
                     break;
             }
         }
@@ -107,7 +107,7 @@ public partial class Main : Node
         // If headless, we can only be a server.
         if (setting == NetworkSetting.Client && (OS.HasFeature("dedicated_server") || DisplayServer.GetName() == "headless"))
         {
-            GD.PrintErr("Bad configuration: game is in headless mode but is configured as a client. Exiting...");
+            Log.Error("Bad configuration: game is in headless mode but is configured to be a client. Exiting...");
             GetTree().Quit();
         }
 
@@ -118,53 +118,16 @@ public partial class Main : Node
         {
             case NetworkSetting.None:
                 // Launch a server process and wait.
-                try
-                {
-                    Log.Logger = new LoggerConfiguration()
-                        .WriteTo.File("logs/log_client-.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 1 << 22)
-                        .WriteTo.Godot()
-                        .CreateLogger();
-                }
-                catch (Exception ex)
-                {
-                    GD.PrintErr($"Could not instantiate logger: \"{ex.Message}\"");
-                }
-
                 LocalServerManager localServerManager = new LocalServerManager(host, port);
                 localServerManager.ServerIsReady += OnServerIsReady;
                 this.AddChildDeffered(localServerManager);
                 break;
             case NetworkSetting.Server:
-                // Create logger.
-                try
-                {
-                    Log.Logger = new LoggerConfiguration()
-                        .WriteTo.File("logs/log_server-.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 1 << 22)
-                        .WriteTo.Godot()
-                        .CreateLogger();
-                }
-                catch (Exception ex)
-                {
-                    GD.PrintErr($"Could not instantiate logger: \"{ex.Message}\"");
-                }
-
                 Log.Information("Launching as server on port {0}...", port);
                 ServerManager serverManager = new ServerManager(port);
                 GetTree().Root.AddChildDeffered(serverManager);
                 break;
             case NetworkSetting.Client:
-                try
-                {
-                    Log.Logger = new LoggerConfiguration()
-                        .WriteTo.File("logs/log_client-.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 1 << 22)
-                        .WriteTo.Godot()
-                        .CreateLogger();
-                }
-                catch (Exception ex)
-                {
-                    GD.PrintErr($"Could not instantiate logger: \"{ex.Message}\"");
-                }
-
                 SetupClient(host, port);
                 break;
         }
@@ -175,6 +138,18 @@ public partial class Main : Node
         base._Ready();
 
         // Set up logging
+        try
+        {
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Godot()
+                .CreateLogger();
+        }
+        catch (Exception ex)
+        {
+            GD.PrintErr($"Could not instantiate logger: \"{ex.Message}\"");
+            throw ex;
+        }
+
         try
         {
             ParseCmdArgs();
