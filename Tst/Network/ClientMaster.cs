@@ -1,6 +1,7 @@
 ﻿using Quake.PlayerInput;
 using Serilog;
 
+using Quake.Player;
 namespace Quake.Network;
 public partial class ClientMaster : ClientBase
 {
@@ -34,9 +35,9 @@ public partial class ClientMaster : ClientBase
         Log.Information("Player {0} said: \"{1}\"", senderId, message);
     }
 
-    protected override void OnRecvUserInput(byte[] buffer)
+    protected override void OnRecvUserInput(UserCommand userCommand)
     {
-        Log.Information("Got buffer with len {0}", buffer.Length);
+        //Log.Information("Got buffer with len {0}", buffer.Length);
     }
 
     public override void _NetworkPeerConnected(long id)

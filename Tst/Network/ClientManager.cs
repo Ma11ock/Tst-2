@@ -1,13 +1,15 @@
 ﻿using Godot;
-using Quake.Network;
-using Quake.PlayerInput;
 using Serilog;
+using Quake.Player;
 
 namespace Quake.Network;
 
 // Network manager on the client side.
 public partial class ClientManager : ClientBase
 {
+    public const int NUM_COMMAND_BACKUPS = 64;
+    public const int NUM_PACKET_BACKUPS = 32;
+
     public static readonly PackedScene SceneManagerClient = ResourceLoader.Load<PackedScene>(@"res://scene_manager_client.tscn");
     public ENetMultiplayerPeer _realClient { get; private set; }
     // TODO will need to make this more robust when we have the ability to move servers.
@@ -16,6 +18,10 @@ public partial class ClientManager : ClientBase
     public readonly int RemotePort = 0;
 
     private Main _main;
+
+    private UserCommand[] _userCommands = new UserCommand[NUM_COMMAND_BACKUPS];
+
+    private int _commandNumber = 0;
 
     public ClientManager(string remoteHost, int remotePort)
     {
@@ -26,7 +32,7 @@ public partial class ClientManager : ClientBase
     public override void _Ready()
     {
         base._Ready();
-        Log.Information("Starting wclient and connecting to server at {0}:{1}...", RemoteHost, RemotePort);
+        Log.Information("Starting client and connecting to server at {0}:{1}...", RemoteHost, RemotePort);
 
         Multiplayer.ConnectedToServer += _ConnectedToServer;
         Multiplayer.ServerDisconnected += _ServerDisconnected;
@@ -84,6 +90,9 @@ public partial class ClientManager : ClientBase
         Log.Information(message);
     }
 
+    public void SendInput()
+    {
+    }
 
     public override void SendMessage(string message)
     {
@@ -110,6 +119,6 @@ public partial class ClientManager : ClientBase
         base._PhysicsProcess(delta);
         if (_realClient.GetConnectionStatus() != MultiplayerPeer.ConnectionStatus.Connected) return;
 
-        RpcId(1, new StringName(nameof(ClientBase.RecvUserInput)), Variant.From(1));
+        RpcId(1, new StringName(nameof(ClientBase.RecvUserInput)), new Vector3(), 0.0f, 0.0f, false);
     }
 }

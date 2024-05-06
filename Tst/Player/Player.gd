@@ -78,7 +78,6 @@ func update_camera_transform():
     camera_gt_current = camera_target.global_transform
     
 func _process(delta: float) -> void:
-    #pass
     if update_camera:
         update_camera_transform()
         update_camera = false
@@ -90,7 +89,8 @@ func _process(delta: float) -> void:
 
     var head_xform : Transform3D = head.get_global_transform()
     
-    camera_target_position = lerp(camera_target_position, head_xform.origin, delta * speed * STAIRS_FEELING_COEFFICIENT * camera_lerp_coefficient)
+    camera_target_position = lerp(camera_target_position, head_xform.origin,
+        delta * speed * STAIRS_FEELING_COEFFICIENT * camera_lerp_coefficient)
 
     if is_on_floor():
         time_in_air = 0.0
@@ -127,6 +127,7 @@ func _input(event):
 
 func _physics_process(delta):
     update_camera = true
+    return
     var is_step: bool = false
     
     var input = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")

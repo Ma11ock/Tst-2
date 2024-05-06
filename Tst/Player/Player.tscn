@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://x3l0v6tbskoe"]
 
-[ext_resource type="Script" path="res://Player/Player.gd" id="1"]
+[ext_resource type="Script" path="res://Player/Player.cs" id="1_qhdxi"]
 
 [sub_resource type="BoxShape3D" id="6"]
 margin = 0.0
@@ -23,7 +23,7 @@ size = Vector3(0.1, 0.2, 0.5)
 [node name="Player" type="CharacterBody3D"]
 wall_min_slide_angle = 0.0872665
 floor_snap_length = 0.2
-script = ExtResource("1")
+script = ExtResource("1_qhdxi")
 
 [node name="CollisionShape3D1" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
